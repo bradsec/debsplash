@@ -1,0 +1,29 @@
+# Build output
+/build/
+/debsplash
+
+# IDE / editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Go
+*.exe
+*.test
+*.out
+
+# Local secrets and generated reports
+.env*
+*.pem
+id_*
+*.key
+coverage.*
+
+# Local agent files
+.claude/

@@ -1,0 +1,55 @@
+name: Go Build and Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up Go
+        uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version-file: go.mod
+
+      - name: Verify modules
+        run: go mod verify
+
+      - name: Vet
+        run: go vet ./...
+
+      - name: Install test tools
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends libglib2.0-dev-bin
+
+      - name: Test
+        run: go test ./...
+
+      - name: Build Linux binary
+        run: CGO_ENABLED=0 GOARCH=amd64 GOOS=linux go build -mod=readonly -o debsplash-linux-amd64
+
+      - name: Check module files
+        run: git diff --exit-code -- go.mod go.sum
+
+      - name: Create checksums
+        run: sha256sum debsplash-linux-amd64 > SHA256SUMS
+
+      - name: Create Release and Upload Assets
+        uses: softprops/action-gh-release@efb35369e0ad2afab669f228072c1b0d510eae64 # v3.0.3
+        with:
+          body: Release ${{ github.ref_name }} of debsplash. See [the changelog](https://github.com/bradsec/debsplash/blob/${{ github.ref_name }}/CHANGELOG.md) for changes. Verify the attached binary with SHA256SUMS.
+          files: |
+            debsplash-linux-amd64
+            SHA256SUMS
+          fail_on_unmatched_files: true
