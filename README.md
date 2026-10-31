@@ -31,20 +31,44 @@ and the desktop login screen from a single command. Supports automatic backup an
 Runtime dependencies (`grub2-common`, `plymouth`, `libglib2.0-dev-bin`, `dconf-cli`, `initramfs-tools`)
 are installed via `apt-get` when a required command is missing, unless `--no-auto-install` is set.
 
-## Build & Install
+## Install
+
+### Prebuilt binary (recommended)
+
+No Go toolchain needed. Download `debsplash-linux-amd64` and `SHA256SUMS` from the
+[Releases page](https://github.com/bradsec/debsplash/releases/latest), or fetch, verify, and install
+them from the terminal:
 
 ```bash
-git clone https://github.com/bradsec/debsplash.git
-cd debsplash
-make build
-sudo make install
+curl -fLO https://github.com/bradsec/debsplash/releases/latest/download/debsplash-linux-amd64 \
+  && curl -fLO https://github.com/bradsec/debsplash/releases/latest/download/SHA256SUMS \
+  && sha256sum -c SHA256SUMS \
+  && sudo install -m 0755 debsplash-linux-amd64 /usr/local/bin/debsplash
 ```
 
-To uninstall:
+The binary is statically linked for Linux amd64. If you downloaded it in a browser, run the last two
+commands from the download folder.
+
+### Build from source
+
+Requires Go 1.27.3 or newer from <https://go.dev/dl/>. Check with `go version`.
 
 ```bash
-sudo make uninstall
+git clone https://github.com/bradsec/debsplash.git \
+  && cd debsplash \
+  && make build \
+  && sudo make install
 ```
+
+`make build` runs as your user; `sudo make install` only copies the built binary.
+
+### Uninstall
+
+```bash
+sudo rm -f /usr/local/bin/debsplash
+```
+
+From a source checkout, `sudo make uninstall` does the same.
 
 ## Usage
 
